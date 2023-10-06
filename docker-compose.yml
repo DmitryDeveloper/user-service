@@ -1,0 +1,54 @@
+version: '3'
+
+services:
+
+  app:
+    container_name: app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+    depends_on: 
+      - mysql
+    environment:
+      SERVICE_NAME: app
+      SERVICE_TAGS: dev
+    networks:
+      - backend-network
+
+  mysql:
+    container_name: mysql
+    image: mysql:latest
+    restart: unless-stopped
+    environment:
+      SERVICE_NAME: mysql
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: user_service
+    volumes:
+      - dbdata:/var/lib/mysql/
+    networks:
+      - backend-network
+
+  rabbitmq-ui:
+    container_name: rabbitmq-ui
+    hostname: rabbitmq-ui
+    image: rabbitmq:management
+    restart: unless-stopped
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - backend-network
+      
+networks:
+  backend-network:
+
+volumes:
+  rabbitmq-data:
+    driver: local
+  dbdata:
+    driver: local
