@@ -21,9 +21,12 @@ type Token struct {
 // a struct to rep user account
 type Account struct {
 	gorm.Model
-	Email    string `json:"email"`
-	Password string `json:"password"`
-	Token    string `json:"token";sql:"-"`
+	FirstName string `json:"first_name"`
+	LastName  string `json:"last_name"`
+	Email     string `json:"email"`
+	BirthDate string `json:"birth_date"`
+	Password  string `json:"password"`
+	Token     string `json:"token";sql:"-"`
 }
 
 // Validate incoming user details...
@@ -109,14 +112,24 @@ func Login(email, password string) map[string]interface{} {
 	return resp
 }
 
-func GetUser(u uint) *Account {
-
+func GetUser(u string) *Account {
 	acc := &Account{}
-	GetDB().Table("accounts").Where("id = ?", u).First(acc)
-	if acc.Email == "" { //User not found!
+	GetDB().First(acc)
+	if acc.Email == "" {
 		return nil
 	}
 
 	acc.Password = ""
 	return acc
+}
+
+func GetAll() []Account {
+	var users []Account
+	GetDB().Find(&users)
+
+	return users
+}
+
+func (user *Account) Save() {
+	db.Save(&user)
 }
