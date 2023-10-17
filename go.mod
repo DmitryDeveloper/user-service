@@ -1,4 +1,4 @@
-module github.com/DmitryDeveloper/user-service
+module user-service
 
 go 1.21.1
 

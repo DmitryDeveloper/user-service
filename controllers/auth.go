@@ -6,8 +6,9 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/DmitryDeveloper/user-service/models"
-	u "github.com/DmitryDeveloper/user-service/utils"
+	"user-service/models"
+	u "user-service/utils"
+
 	"github.com/streadway/amqp"
 )
 
@@ -16,23 +17,23 @@ type UserRegisteredEvent struct {
 	Email string `json:"email"`
 }
 
-var CreateAccount = func(w http.ResponseWriter, r *http.Request) {
+var CreateUser = func(w http.ResponseWriter, r *http.Request) {
 
-	account := &models.Account{}
-	err := json.NewDecoder(r.Body).Decode(account) //decode the request body into struct and failed if any error occur
+	user := &models.User{}
+	err := json.NewDecoder(r.Body).Decode(user)
 	if err != nil {
 		u.Respond(w, u.Message(false, "Invalid request"))
 		return
 	}
 
-	resp := account.Create()
+	resp := user.Create()
 
 	if resp["status"] == true {
-		fmt.Println("Account created")
+		fmt.Println("User created")
 
 		userRegisteredEventData := UserRegisteredEvent{
-			ID:    int(account.ID),
-			Email: account.Email,
+			ID:    int(user.ID),
+			Email: user.Email,
 		}
 		jsonData, _ := json.Marshal(userRegisteredEventData)
 
@@ -48,14 +49,14 @@ var CreateAccount = func(w http.ResponseWriter, r *http.Request) {
 
 var Authenticate = func(w http.ResponseWriter, r *http.Request) {
 
-	account := &models.Account{}
-	err := json.NewDecoder(r.Body).Decode(account) //decode the request body into struct and failed if any error occur
+	user := &models.User{}
+	err := json.NewDecoder(r.Body).Decode(user)
 	if err != nil {
 		u.Respond(w, u.Message(false, "Invalid request"))
 		return
 	}
 
-	resp := models.Login(account.Email, account.Password)
+	resp := models.Login(user.Email, user.Password)
 	u.Respond(w, resp)
 }
 
@@ -85,7 +86,7 @@ func sendToQueue(data []byte) {
 		false,
 		amqp.Publishing{
 			ContentType: "application/json",
-			Body:        data,               // pass data
+			Body:        data,
 		})
 	if err != nil {
 		fmt.Println("Cannot publsh message in RabbitMQ")

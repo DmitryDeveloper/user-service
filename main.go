@@ -5,8 +5,9 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/DmitryDeveloper/user-service/controllers"
-	u "github.com/DmitryDeveloper/user-service/utils"
+	"user-service/controllers"
+	u "user-service/utils"
+
 	"github.com/gorilla/mux"
 )
 
@@ -20,7 +21,7 @@ func main() {
 		u.Respond(w, u.Message(true, "OK"))
 	}).Methods("GET")
 
-	apiRouter.HandleFunc("/register", controllers.CreateAccount).Methods("POST")
+	apiRouter.HandleFunc("/register", controllers.CreateUser).Methods("POST")
 	apiRouter.HandleFunc("/login", controllers.Authenticate).Methods("POST")
 
 	apiRouter.HandleFunc("/users/{user_id}", controllers.GetUser).Methods("GET")

@@ -4,8 +4,9 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/DmitryDeveloper/user-service/models"
-	u "github.com/DmitryDeveloper/user-service/utils"
+	"user-service/models"
+	u "user-service/utils"
+
 	"github.com/gorilla/mux"
 )
 
@@ -36,7 +37,7 @@ func GetAll(w http.ResponseWriter, r *http.Request) {
 func UpdateUser(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
-	var updatedUserData models.Account
+	var updatedUserData models.User
 	err := json.NewDecoder(r.Body).Decode(&updatedUserData)
 	if err != nil {
 		u.Respond(w, u.Message(false, "Invalid request"))
