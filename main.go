@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 
+	"user-service/app"
 	"user-service/controllers"
 	u "user-service/utils"
 
@@ -17,6 +18,9 @@ func main() {
 
 	apiRouter := router.PathPrefix("/api").Subrouter()
 
+	authApiRouter := apiRouter.PathPrefix("/auth").Subrouter()
+	authApiRouter.Use(app.JwtAuthentication)
+
 	apiRouter.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
 		u.Respond(w, u.Message(true, "OK"))
 	}).Methods("GET")
@@ -25,10 +29,10 @@ func main() {
 	apiRouter.HandleFunc("/login", controllers.Authenticate).Methods("POST")
 
 	apiRouter.HandleFunc("/users/{user_id}", controllers.GetUser).Methods("GET")
-	apiRouter.HandleFunc("/users", controllers.GetAll).Methods("GET")
-	apiRouter.HandleFunc("/users/{user_id}", controllers.UpdateUser).Methods("PUT")
 
-	// router.Use(app.JwtAuthentication) //attach JWT auth middleware
+	authApiRouter.HandleFunc("/users", controllers.GetAll).Methods("GET")
+	authApiRouter.HandleFunc("/users/{user_id}", controllers.UpdateUser).Methods("PUT")
+	authApiRouter.HandleFunc("/users/{user_id}/change_password", controllers.UpdatePassword).Methods("POST")
 
 	//router.NotFoundHandler = app.NotFoundHandler
 
