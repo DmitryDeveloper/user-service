@@ -28,6 +28,7 @@ func SendToQueue(data []byte) {
 	}
 	defer conn.Close()
 
+	// Should I keep channel in memory?
 	ch, err := conn.Channel()
 	if err != nil {
 		fmt.Println("Cannot create channel in RabbitMQ")
@@ -39,8 +40,8 @@ func SendToQueue(data []byte) {
 	fmt.Println("SENT DATA TO RABBITMQ")
 
 	err = ch.Publish(
-		os.Getenv("RABBIT_MQ_USERS_QUEUE_NAME"),
-		os.Getenv("RABBIT_MQ_USERS_QUEUE_KEY"),
+		os.Getenv("RABBIT_MQ_USERS_EXCHANGE_NAME"),
+		os.Getenv("RABBIT_MQ_USERS_ROUTE_KEY"),
 		false,
 		false,
 		amqp.Publishing{
